@@ -1,8 +1,6 @@
 package com.example.horario.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,14 +16,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.outlined.EventNote
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -35,9 +30,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,8 +53,6 @@ private val DAY_FULL = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Vierne
 @Composable
 fun ScheduleScreen(
     classesByDay: Map<Int, List<ClassItem>>,
-    isDark: Boolean,
-    onToggleTheme: () -> Unit,
     onSave: (ClassItem) -> Unit,
     onDelete: (ClassItem) -> Unit
 ) {
@@ -81,36 +72,8 @@ fun ScheduleScreen(
     var editing by remember { mutableStateOf<ClassItem?>(null) }
     var showDialog by remember { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text("Horario", fontWeight = FontWeight.SemiBold)
-                },
-                actions = {
-                    IconButton(onClick = onToggleTheme) {
-                        Icon(
-                            imageVector = if (isDark) Icons.Filled.LightMode else Icons.Filled.DarkMode,
-                            contentDescription = "Cambiar tema"
-                        )
-                    }
-                }
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
-                editing = null
-                showDialog = true
-            }) {
-                Icon(Icons.Filled.Add, contentDescription = "Agregar clase")
-            }
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
+    Box(Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxSize()) {
             DaySelector(selectedDay) { selectedDay = it }
 
             val dayClasses = classesByDay[selectedDay].orEmpty()
@@ -134,6 +97,18 @@ fun ScheduleScreen(
                 }
             }
         }
+
+        FloatingActionButton(
+            onClick = {
+                editing = null
+                showDialog = true
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Icon(Icons.Filled.Add, contentDescription = "Agregar clase")
+        }
     }
 
     if (showDialog) {
@@ -149,6 +124,7 @@ fun ScheduleScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DaySelector(selected: Int, onSelect: (Int) -> Unit) {
     LazyRow(
