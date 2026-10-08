@@ -1,24 +1,12 @@
-# Horario 📅
 
-App de **horario de clases** para Android, minimalista e intuitiva. **Sin IA, sin internet, sin API keys.**
+App de **horario de clases** para Android
 
-Reescrita desde cero en Kotlin + Jetpack Compose, reemplazando por completo la dependencia de la API de Gemini del proyecto original.
-
-## Funciones
-
-- 🗓️ Horario semanal (Lunes a Domingo) con selector de día.
-- ➕ Agregar / editar / borrar clases: materia, aula/nota, día, hora de inicio y fin, color.
-- 🔔 **Notificación una vez antes de cada clase** (configurable: 5, 10, 15 o 30 min antes, o sin aviso). Se repite cada semana.
-- 🌙☀️ **Modo claro y oscuro** (sigue el sistema y se puede alternar con un botón).
-- 💾 Guardado local con **Room** (base de datos en el teléfono). Todo offline.
-- 🔁 Los recordatorios se reprograman solos tras reiniciar el teléfono.
-
-## Tecnología
-
-- Kotlin + Jetpack Compose (Material 3)
-- Room (persistencia local)
-- AlarmManager + NotificationManager (recordatorios)
-- minSdk 24 · targetSdk 34
+-  Horario semanal (Lunes a Domingo) con selector de día.
+-  Agregar / editar / borrar clases: materia, aula/nota, día, hora de inicio y fin, color.
+-  **Notificación una vez antes de cada clase** (configurable: 5, 10, 15 o 30 min antes, o sin aviso). Se repite cada semana.
+-  **Modo claro y oscuro** (sigue el sistema y se puede alternar con un botón).
+-  Guardado local con **Room** (base de datos en el teléfono). Todo offline.
+-  Los recordatorios se reprograman solos tras reiniciar el teléfono.
 
 ## Cómo compilar y ejecutar
 
