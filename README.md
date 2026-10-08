@@ -1,6 +1,38 @@
 
 App de **horario de clases** para Android
 
+Reescrita desde cero en Kotlin + Jetpack Compose, reemplazando por completo la dependencia de la API de Gemini del proyecto original.
+
+## Funciones
+
+Dos pestañas: **📅 Horario** y **📝 Notas**.
+
+### Horario
+- 🗓️ Horario semanal (Lunes a Domingo) con selector de día.
+- ➕ Agregar / editar / borrar clases: materia, aula/nota, día, hora de inicio y fin, color.
+- 🔔 **Notificación una vez antes de cada clase** (configurable: 5, 10, 15 o 30 min antes, o sin aviso). Se repite cada semana.
+
+### Notas (calculadora de calificaciones)
+- 📚 Crea materias (ej. "Cálculo Diferencial") como **lista desplegable**.
+- Cada materia muestra su **nota/promedio** con color según el estado.
+- Al desplegar, agregas **actividades** con **nombre + nota + porcentaje editable**.
+- Calcula automáticamente la **nota ponderada** = Σ(nota × %/100).
+- **Colores (escala 1.0–5.0, aprueba en 3.0):**
+  - 🔴 Rojo: 1.0 – 2.9 (perdiendo)
+  - 🟠 Naranja: 3.0 – 3.8 (en riesgo)
+  - 🟢 Verde: 3.9 – 5.0 (bien)
+
+### General
+- 🌙☀️ **Modo claro y oscuro** (sigue el sistema y se puede alternar con un botón).
+- 💾 Guardado local con **Room** (base de datos en el teléfono). Todo offline.
+- 🔁 Los recordatorios se reprograman solos tras reiniciar el teléfono.
+
+## Tecnología
+
+- Kotlin + Jetpack Compose (Material 3)
+- Room (persistencia local)
+- AlarmManager + NotificationManager (recordatorios)
+- minSdk 24 · targetSdk 34
 -  Horario semanal (Lunes a Domingo) con selector de día.
 -  Agregar / editar / borrar clases: materia, aula/nota, día, hora de inicio y fin, color.
 -  **Notificación una vez antes de cada clase** (configurable: 5, 10, 15 o 30 min antes, o sin aviso). Se repite cada semana.

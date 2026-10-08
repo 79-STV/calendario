@@ -17,10 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.horario.ui.ScheduleScreen
-import com.example.horario.ui.ScheduleViewModel
+import com.example.horario.ui.MainScreen
 import com.example.horario.ui.theme.HorarioTheme
 
 class MainActivity : ComponentActivity() {
@@ -46,15 +43,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val vm: ScheduleViewModel = viewModel()
-                    val classesByDay by vm.classesByDay.collectAsStateWithLifecycle()
-
-                    ScheduleScreen(
-                        classesByDay = classesByDay,
+                    MainScreen(
                         isDark = isDark,
-                        onToggleTheme = { isDark = !isDark },
-                        onSave = vm::save,
-                        onDelete = vm::delete
+                        onToggleTheme = { isDark = !isDark }
                     )
                 }
             }

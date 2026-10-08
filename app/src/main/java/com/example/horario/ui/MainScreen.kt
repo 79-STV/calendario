@@ -1,0 +1,103 @@
+package com.example.horario.ui
+
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Grading
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+
+private enum class Tab(val title: String) {
+    HORARIO("Horario"),
+    NOTAS("Notas")
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainScreen(
+    isDark: Boolean,
+    onToggleTheme: () -> Unit
+) {
+    var tab by remember { mutableStateOf(Tab.HORARIO) }
+
+    val scheduleVm: ScheduleViewModel = viewModel()
+    val gradesVm: GradesViewModel = viewModel()
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(tab.title, fontWeight = FontWeight.SemiBold) },
+                actions = {
+                    IconButton(onClick = onToggleTheme) {
+                        Icon(
+                            imageVector = if (isDark) Icons.Filled.LightMode else Icons.Filled.DarkMode,
+                            contentDescription = "Cambiar tema"
+                        )
+                    }
+                }
+            )
+        },
+        bottomBar = {
+            NavigationBar {
+                NavigationBarItem(
+                    selected = tab == Tab.HORARIO,
+                    onClick = { tab = Tab.HORARIO },
+                    icon = { Icon(Icons.Outlined.CalendarMonth, contentDescription = null) },
+                    label = { Text("Horario") }
+                )
+                NavigationBarItem(
+                    selected = tab == Tab.NOTAS,
+                    onClick = { tab = Tab.NOTAS },
+                    icon = { Icon(Icons.Outlined.Grading, contentDescription = null) },
+                    label = { Text("Notas") }
+                )
+            }
+        }
+    ) { padding ->
+        androidx.compose.foundation.layout.Box(
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            when (tab) {
+                Tab.HORARIO -> {
+                    val classesByDay by scheduleVm.classesByDay.collectAsStateWithLifecycle()
+                    ScheduleScreen(
+                        classesByDay = classesByDay,
+                        onSave = scheduleVm::save,
+                        onDelete = scheduleVm::delete
+                    )
+                }
+                Tab.NOTAS -> {
+                    val subjects by gradesVm.subjects.collectAsStateWithLifecycle()
+                    GradesScreen(
+                        subjects = subjects,
+                        onAddSubject = gradesVm::addSubject,
+                        onDeleteSubject = gradesVm::deleteSubject,
+                        onAddActivity = gradesVm::addActivity,
+                        onUpdateActivity = gradesVm::updateActivity,
+                        onDeleteActivity = gradesVm::deleteActivity
+                    )
+                }
+            }
+        }
+    }
+}
