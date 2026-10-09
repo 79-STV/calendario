@@ -58,5 +58,8 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
+    // OCR offline (reconocimiento de texto en fotos)
+    implementation(libs.mlkit.text.recognition)
+
     debugImplementation(libs.androidx.ui.tooling)
 }
