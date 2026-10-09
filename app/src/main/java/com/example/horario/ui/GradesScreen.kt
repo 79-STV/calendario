@@ -60,7 +60,8 @@ fun GradesScreen(
     onDeleteSubject: (Subject) -> Unit,
     onAddActivity: (subjectId: Long, name: String, grade: Double, weight: Double) -> Unit,
     onUpdateActivity: (Activity) -> Unit,
-    onDeleteActivity: (Activity) -> Unit
+    onDeleteActivity: (Activity) -> Unit,
+    onApplyTemplate: (subjectId: Long) -> Unit = {}
 ) {
     var showAddSubject by remember { mutableStateOf(false) }
     val expanded = remember { mutableStateMapOf<Long, Boolean>() }
@@ -85,7 +86,8 @@ fun GradesScreen(
                         onDeleteSubject = { onDeleteSubject(sa.subject) },
                         onAddActivity = { addActivityForSubject = sa.subject.id },
                         onEditActivity = { editingActivity = it },
-                        onDeleteActivity = onDeleteActivity
+                        onDeleteActivity = onDeleteActivity,
+                        onApplyTemplate = { onApplyTemplate(sa.subject.id) }
                     )
                 }
             }
@@ -145,7 +147,8 @@ private fun SubjectCard(
     onDeleteSubject: () -> Unit,
     onAddActivity: () -> Unit,
     onEditActivity: (Activity) -> Unit,
-    onDeleteActivity: (Activity) -> Unit
+    onDeleteActivity: (Activity) -> Unit,
+    onApplyTemplate: () -> Unit
 ) {
     val grade = data.projectedGrade
     val status = GradeStatus.of(grade)
@@ -189,6 +192,12 @@ private fun SubjectCard(
         AnimatedVisibility(visible = isExpanded) {
             Column(Modifier.padding(start = 16.dp, end = 8.dp, bottom = 12.dp)) {
                 Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+
+                // Si aún no hay actividades, ofrecemos la plantilla predefinida.
+                if (data.activities.isEmpty()) {
+                    TemplateSuggestion(onApplyTemplate = onApplyTemplate)
+                }
+
                 data.activities.forEach { act ->
                     ActivityRow(
                         activity = act,
@@ -216,6 +225,36 @@ private fun SubjectCard(
                         Text("Borrar materia", color = MaterialTheme.colorScheme.error)
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TemplateSuggestion(onApplyTemplate: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 10.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f))
+            .padding(14.dp)
+    ) {
+        Column {
+            Text(
+                "✨ Plantilla predefinida",
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                "Taller 1 (15%) · Taller 2 (15%) · Quiz (15%) · Parcial (20%) · Final (35%)",
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
+            Spacer(Modifier.height(8.dp))
+            androidx.compose.material3.FilledTonalButton(onClick = onApplyTemplate) {
+                Text("Usar plantilla")
             }
         }
     }

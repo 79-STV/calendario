@@ -39,6 +39,18 @@ data class Activity(
     val weightPercent: Double = 0.0
 )
 
+/** Plantilla de actividades predefinida (pesos típicos, editables tras aplicarse). */
+object GradeTemplate {
+    /** Nombre + porcentaje. La nota se deja en 0 para que el usuario la complete. */
+    val DEFAULT: List<Pair<String, Double>> = listOf(
+        "Taller 1" to 15.0,
+        "Taller 2" to 15.0,
+        "Quiz" to 15.0,
+        "Parcial" to 20.0,
+        "Final" to 35.0
+    )
+}
+
 /** Una materia junto con sus actividades y los cálculos ya resueltos. */
 data class SubjectWithActivities(
     val subject: Subject,

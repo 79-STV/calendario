@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Horario" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Tema base de la app: fondo oscuro para que NO haya flash blanco al abrir. -->
+    <style name="Theme.Horario" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/splash_bg</item>
+        <item name="android:statusBarColor">@color/splash_bg</item>
+        <item name="android:navigationBarColor">@color/splash_bg</item>
+    </style>
+
+    <!-- Tema de arranque: muestra el logo centrado sobre fondo oscuro. -->
+    <style name="Theme.Horario.Splash" parent="Theme.Horario">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+    </style>
 </resources>
