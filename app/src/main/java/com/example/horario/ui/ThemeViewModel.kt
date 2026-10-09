@@ -9,7 +9,14 @@ import com.example.horario.data.SettingsStore
 import com.example.horario.ui.theme.ThemePalette
 
 enum class ThemeMode { SYSTEM, LIGHT, DARK }
-enum class CardStyle { NORMAL, GLASS }
+enum class CardStyle { NORMAL, GLASS, FLAT, OUTLINE, NEON }
+enum class CornerShape(val label: String, val radius: Int) {
+    SQUARE("Cuadrado", 0),
+    SOFT("Suave", 8),
+    ROUND("Redondo", 18),
+    PILL("Píldora", 28)
+}
+enum class Density(val label: String) { COMFY("Cómodo"), COMPACT("Compacto") }
 
 class ThemeViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -25,6 +32,16 @@ class ThemeViewModel(app: Application) : AndroidViewModel(app) {
 
     var cardStyle by mutableStateOf(
         runCatching { CardStyle.valueOf(store.cardStyle) }.getOrDefault(CardStyle.NORMAL)
+    )
+        private set
+
+    var corner by mutableStateOf(
+        runCatching { CornerShape.valueOf(store.cornerShape) }.getOrDefault(CornerShape.ROUND)
+    )
+        private set
+
+    var density by mutableStateOf(
+        runCatching { Density.valueOf(store.density) }.getOrDefault(Density.COMFY)
     )
         private set
 
@@ -48,5 +65,15 @@ class ThemeViewModel(app: Application) : AndroidViewModel(app) {
     fun updateCardStyle(newStyle: CardStyle) {
         cardStyle = newStyle
         store.cardStyle = newStyle.name
+    }
+
+    fun updateCorner(newCorner: CornerShape) {
+        corner = newCorner
+        store.cornerShape = newCorner.name
+    }
+
+    fun updateDensity(newDensity: Density) {
+        density = newDensity
+        store.density = newDensity.name
     }
 }

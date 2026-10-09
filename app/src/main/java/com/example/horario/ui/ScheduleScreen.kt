@@ -89,13 +89,16 @@ fun ScheduleScreen(
                 NextClassBanner(next)
             }
 
+            // Densidad: separa más (cómodo) o menos (compacto) las tarjetas.
+            val gap = if (LocalAppDensity.current == Density.COMPACT) 6.dp else 12.dp
+
             val dayClasses = classesByDay[selectedDay].orEmpty()
             if (dayClasses.isEmpty()) {
                 EmptyState(DAY_FULL[selectedDay - 1])
             } else {
                 LazyColumn(
                     contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(gap)
                 ) {
                     items(dayClasses, key = { it.id }) { item ->
                         ClassCard(
@@ -191,13 +194,14 @@ private fun ClassCard(item: ClassItem, onEdit: () -> Unit, onDelete: () -> Unit)
     val accent = runCatching { Color(android.graphics.Color.parseColor(item.colorHex)) }
         .getOrDefault(MaterialTheme.colorScheme.primary)
 
+    val pad = if (LocalAppDensity.current == Density.COMPACT) 10.dp else 14.dp
     AppCard(
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp),
+                .padding(pad),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(

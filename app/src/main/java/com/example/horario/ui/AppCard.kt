@@ -16,50 +16,97 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 
-/** Estilo de tarjeta activo, accesible desde cualquier composable hijo. */
+/** Estilo de tarjeta y forma activos, accesibles desde cualquier composable hijo. */
 val LocalCardStyle = compositionLocalOf { CardStyle.NORMAL }
+val LocalCorner = compositionLocalOf { CornerShape.ROUND }
+// Nombre propio para no chocar con androidx.compose.ui.platform.LocalDensity.
+val LocalAppDensity = compositionLocalOf { Density.COMFY }
 
 @Composable
-fun ProvideCardStyle(style: CardStyle, content: @Composable () -> Unit) {
-    CompositionLocalProvider(LocalCardStyle provides style, content = content)
+fun ProvideAppStyle(
+    cardStyle: CardStyle,
+    corner: CornerShape,
+    density: Density,
+    content: @Composable () -> Unit
+) {
+    CompositionLocalProvider(
+        LocalCardStyle provides cardStyle,
+        LocalCorner provides corner,
+        LocalAppDensity provides density,
+        content = content
+    )
 }
 
+/** Radio de esquina actual, como shape reutilizable. */
+@Composable
+fun appShape() = RoundedCornerShape(LocalCorner.current.radius.dp)
+
 /**
- * Tarjeta reutilizable. En modo NORMAL es una ElevatedCard estándar;
- * en modo GLASS usa un fondo translúcido con borde sutil (efecto "vidrio").
+ * Tarjeta reutilizable que respeta el estilo elegido:
+ * NORMAL (elevada), GLASS (vidrio), FLAT (plano con borde fino),
+ * OUTLINE (contorno grueso de acento), NEON (borde brillante de acento).
  */
 @Composable
 fun AppCard(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    when (LocalCardStyle.current) {
+    val shape = appShape()
+    val style = LocalCardStyle.current
+    val surface = MaterialTheme.colorScheme.surface
+    val accent = MaterialTheme.colorScheme.primary
+
+    when (style) {
         CardStyle.NORMAL -> {
             ElevatedCard(
                 modifier = modifier,
-                colors = CardDefaults.elevatedCardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
+                shape = shape,
+                colors = CardDefaults.elevatedCardColors(containerColor = surface)
             ) { content() }
         }
         CardStyle.GLASS -> {
-            val base = MaterialTheme.colorScheme.surface
-            val shape = RoundedCornerShape(18.dp)
             Box(
                 modifier = modifier
                     .clip(shape)
                     .background(
                         Brush.verticalGradient(
-                            listOf(
-                                base.copy(alpha = 0.55f),
-                                base.copy(alpha = 0.30f)
-                            )
+                            listOf(surface.copy(alpha = 0.55f), surface.copy(alpha = 0.30f))
                         )
                     )
                     .border(
                         BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)),
                         shape
                     )
+            ) { content() }
+        }
+        CardStyle.FLAT -> {
+            Box(
+                modifier = modifier
+                    .clip(shape)
+                    .background(surface)
+                    .border(
+                        BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f)),
+                        shape
+                    )
+            ) { content() }
+        }
+        CardStyle.OUTLINE -> {
+            Box(
+                modifier = modifier
+                    .clip(shape)
+                    .background(surface)
+                    .border(BorderStroke(2.5.dp, accent), shape)
+            ) { content() }
+        }
+        CardStyle.NEON -> {
+            Box(
+                modifier = modifier
+                    .clip(shape)
+                    // Doble borde para simular brillo neón.
+                    .border(BorderStroke(3.dp, accent.copy(alpha = 0.35f)), shape)
+                    .clip(shape)
+                    .background(surface)
+                    .border(BorderStroke(1.5.dp, accent), shape)
             ) { content() }
         }
     }
