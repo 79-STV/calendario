@@ -4,6 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -66,7 +70,11 @@ fun MainScreen(
     themeMode: ThemeMode,
     onSelectMode: (ThemeMode) -> Unit,
     cardStyle: CardStyle,
-    onSelectCardStyle: (CardStyle) -> Unit
+    onSelectCardStyle: (CardStyle) -> Unit,
+    corner: CornerShape,
+    onSelectCorner: (CornerShape) -> Unit,
+    density: Density,
+    onSelectDensity: (Density) -> Unit
 ) {
     var tab by remember { mutableStateOf(Tab.HORARIO) }
     var showThemeDialog by remember { mutableStateOf(false) }
@@ -163,6 +171,10 @@ fun MainScreen(
             onSelectMode = onSelectMode,
             cardStyle = cardStyle,
             onSelectCardStyle = onSelectCardStyle,
+            corner = corner,
+            onSelectCorner = onSelectCorner,
+            density = density,
+            onSelectDensity = onSelectDensity,
             onDismiss = { showThemeDialog = false }
         )
     }
@@ -178,13 +190,18 @@ private fun ThemeDialog(
     onSelectMode: (ThemeMode) -> Unit,
     cardStyle: CardStyle,
     onSelectCardStyle: (CardStyle) -> Unit,
+    corner: CornerShape,
+    onSelectCorner: (CornerShape) -> Unit,
+    density: Density,
+    onSelectDensity: (Density) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val scroll = rememberScrollState()
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Apariencia") },
         text = {
-            Column {
+            Column(Modifier.verticalScroll(scroll)) {
                 Text("Modo", fontWeight = FontWeight.Medium)
                 Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -194,11 +211,31 @@ private fun ThemeDialog(
                 }
 
                 Spacer(Modifier.height(16.dp))
+                Text("Forma de esquinas", fontWeight = FontWeight.Medium)
+                Spacer(Modifier.height(6.dp))
+                FlowChips {
+                    CornerShape.entries.forEach { c ->
+                        ModeChip(c.label, corner == c) { onSelectCorner(c) }
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
                 Text("Estilo de tarjetas", fontWeight = FontWeight.Medium)
                 Spacer(Modifier.height(6.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FlowChips {
                     ModeChip("Normal", cardStyle == CardStyle.NORMAL) { onSelectCardStyle(CardStyle.NORMAL) }
                     ModeChip("Glass ✨", cardStyle == CardStyle.GLASS) { onSelectCardStyle(CardStyle.GLASS) }
+                    ModeChip("Plano", cardStyle == CardStyle.FLAT) { onSelectCardStyle(CardStyle.FLAT) }
+                    ModeChip("Contorno", cardStyle == CardStyle.OUTLINE) { onSelectCardStyle(CardStyle.OUTLINE) }
+                    ModeChip("Neón", cardStyle == CardStyle.NEON) { onSelectCardStyle(CardStyle.NEON) }
+                }
+
+                Spacer(Modifier.height(16.dp))
+                Text("Densidad", fontWeight = FontWeight.Medium)
+                Spacer(Modifier.height(6.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    ModeChip("Cómodo", density == Density.COMFY) { onSelectDensity(Density.COMFY) }
+                    ModeChip("Compacto", density == Density.COMPACT) { onSelectDensity(Density.COMPACT) }
                 }
 
                 Spacer(Modifier.height(16.dp))
@@ -254,4 +291,13 @@ private fun ThemeDialog(
 @Composable
 private fun ModeChip(label: String, selected: Boolean, onClick: () -> Unit) {
     FilterChip(selected = selected, onClick = onClick, label = { Text(label) })
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun FlowChips(content: @Composable () -> Unit) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) { content() }
 }

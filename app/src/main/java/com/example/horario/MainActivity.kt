@@ -50,7 +50,11 @@ class MainActivity : ComponentActivity() {
             }
 
             HorarioTheme(darkTheme = isDark, palette = themeVm.palette) {
-                com.example.horario.ui.ProvideCardStyle(themeVm.cardStyle) {
+                com.example.horario.ui.ProvideAppStyle(
+                    cardStyle = themeVm.cardStyle,
+                    corner = themeVm.corner,
+                    density = themeVm.density
+                ) {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
@@ -63,7 +67,11 @@ class MainActivity : ComponentActivity() {
                             themeMode = themeVm.mode,
                             onSelectMode = themeVm::updateMode,
                             cardStyle = themeVm.cardStyle,
-                            onSelectCardStyle = themeVm::updateCardStyle
+                            onSelectCardStyle = themeVm::updateCardStyle,
+                            corner = themeVm.corner,
+                            onSelectCorner = themeVm::updateCorner,
+                            density = themeVm.density,
+                            onSelectDensity = themeVm::updateDensity
                         )
                     }
                 }
