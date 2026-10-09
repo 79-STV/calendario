@@ -12,12 +12,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.horario.ui.MainScreen
+import com.example.horario.ui.ThemeMode
+import com.example.horario.ui.ThemeViewModel
 import com.example.horario.ui.theme.HorarioTheme
 
 class MainActivity : ComponentActivity() {
@@ -30,8 +29,14 @@ class MainActivity : ComponentActivity() {
         com.example.horario.notifications.DailySummaryScheduler.schedule(this)
 
         setContent {
+            val themeVm: ThemeViewModel = viewModel()
+
             val systemDark = isSystemInDarkTheme()
-            var isDark by remember { mutableStateOf(systemDark) }
+            val isDark = when (themeVm.mode) {
+                ThemeMode.SYSTEM -> systemDark
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+            }
 
             // Pide permiso de notificaciones en Android 13+
             val permissionLauncher = rememberLauncherForActivityResult(
@@ -44,15 +49,23 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            HorarioTheme(darkTheme = isDark) {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    MainScreen(
-                        isDark = isDark,
-                        onToggleTheme = { isDark = !isDark }
-                    )
+            HorarioTheme(darkTheme = isDark, palette = themeVm.palette) {
+                com.example.horario.ui.ProvideCardStyle(themeVm.cardStyle) {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        MainScreen(
+                            isDark = isDark,
+                            onToggleTheme = { themeVm.toggleDark(isDark) },
+                            selectedPalette = themeVm.palette,
+                            onSelectPalette = themeVm::setPalette,
+                            themeMode = themeVm.mode,
+                            onSelectMode = themeVm::setMode,
+                            cardStyle = themeVm.cardStyle,
+                            onSelectCardStyle = themeVm::setCardStyle
+                        )
+                    }
                 }
             }
         }

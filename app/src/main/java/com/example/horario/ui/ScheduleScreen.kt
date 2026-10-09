@@ -191,11 +191,8 @@ private fun ClassCard(item: ClassItem, onEdit: () -> Unit, onDelete: () -> Unit)
     val accent = runCatching { Color(android.graphics.Color.parseColor(item.colorHex)) }
         .getOrDefault(MaterialTheme.colorScheme.primary)
 
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
+    AppCard(
+        modifier = Modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
