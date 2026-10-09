@@ -28,22 +28,24 @@ class ThemeViewModel(app: Application) : AndroidViewModel(app) {
     )
         private set
 
-    fun setMode(newMode: ThemeMode) {
+    // Nombres con prefijo "update..." para no chocar con los setters
+    // generados por las propiedades (set-mode / setCardStyle / setPalette).
+    fun updateMode(newMode: ThemeMode) {
         mode = newMode
         store.themeMode = newMode.name
     }
 
     /** Alterna rápido entre claro/oscuro (para el botón del top bar). */
     fun toggleDark(currentlyDark: Boolean) {
-        setMode(if (currentlyDark) ThemeMode.LIGHT else ThemeMode.DARK)
+        updateMode(if (currentlyDark) ThemeMode.LIGHT else ThemeMode.DARK)
     }
 
-    fun setPalette(newPalette: ThemePalette) {
+    fun updatePalette(newPalette: ThemePalette) {
         palette = newPalette
         store.paletteName = newPalette.name
     }
 
-    fun setCardStyle(newStyle: CardStyle) {
+    fun updateCardStyle(newStyle: CardStyle) {
         cardStyle = newStyle
         store.cardStyle = newStyle.name
     }
