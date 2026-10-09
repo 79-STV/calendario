@@ -13,7 +13,8 @@ Dos pestañas: **📅 Horario** y **📝 Notas**.
 - ➕ Agregar / editar / borrar clases: materia, aula/nota, día, hora de inicio y fin, color.
 - 🔔 **Notificación una vez antes de cada clase** (5, 10, 15 o 30 min antes, o sin aviso). Se repite cada semana.
 - 🌙 **Resumen diario a las 8 PM** con las clases de mañana.
-- 📸 **Importar desde foto (OCR offline):** toma o elige una foto de tu horario; la app detecta materias, horas y aulas con **ML Kit** (en el dispositivo, sin internet) y tú eliges el día de cada clase antes de guardar.
+- 📋 **Pegar horario (texto):** copia tu horario de la web de la universidad y pégalo; la app detecta materias, horas y aulas y tú eliges el día. Es la forma **más precisa**.
+- 📸 **Importar desde foto (OCR offline):** alternativa con la cámara/galería usando **ML Kit** (en el dispositivo, sin internet). Útil pero menos exacta que pegar texto.
 - 🛎️ **Banner de permisos**: si faltan permisos para que lleguen las notificaciones, la app te guía para activarlos, con botón de **"Probar notificación"**.
 
 ### Notas (calculadora de calificaciones)
