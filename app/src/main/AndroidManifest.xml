@@ -22,7 +22,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Horario">
+            android:theme="@style/Theme.Horario.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -32,6 +32,11 @@
         <!-- Recibe la alarma y lanza la notificación -->
         <receiver
             android:name=".notifications.ReminderReceiver"
+            android:exported="false" />
+
+        <!-- Resumen diario (la noche anterior) con las clases de mañana -->
+        <receiver
+            android:name=".notifications.DailySummaryReceiver"
             android:exported="false" />
 
         <!-- Reprograma recordatorios tras reiniciar -->

@@ -58,6 +58,22 @@ class GradesViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { dao.updateActivity(activity) }
     }
 
+    /** Crea las actividades de la plantilla predefinida para una materia. */
+    fun applyTemplate(subjectId: Long) {
+        viewModelScope.launch {
+            com.example.horario.data.GradeTemplate.DEFAULT.forEach { (name, weight) ->
+                dao.insertActivity(
+                    Activity(
+                        subjectId = subjectId,
+                        name = name,
+                        grade = 0.0,
+                        weightPercent = weight
+                    )
+                )
+            }
+        }
+    }
+
     fun deleteActivity(activity: Activity) {
         viewModelScope.launch { dao.deleteActivity(activity) }
     }

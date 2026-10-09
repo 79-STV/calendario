@@ -41,10 +41,26 @@ fun MainScreen(
     val scheduleVm: ScheduleViewModel = viewModel()
     val gradesVm: GradesViewModel = viewModel()
 
+    // Saludo según la hora del día (toque creativo).
+    val greeting = remember {
+        val h = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+        when (h) {
+            in 5..11 -> "Buenos días"
+            in 12..18 -> "Buenas tardes"
+            else -> "Buenas noches"
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(tab.title, fontWeight = FontWeight.SemiBold) },
+                title = {
+                    if (tab == Tab.HORARIO) {
+                        Text("$greeting 👋", fontWeight = FontWeight.SemiBold)
+                    } else {
+                        Text(tab.title, fontWeight = FontWeight.SemiBold)
+                    }
+                },
                 actions = {
                     IconButton(onClick = onToggleTheme) {
                         Icon(
@@ -94,7 +110,8 @@ fun MainScreen(
                         onDeleteSubject = gradesVm::deleteSubject,
                         onAddActivity = gradesVm::addActivity,
                         onUpdateActivity = gradesVm::updateActivity,
-                        onDeleteActivity = gradesVm::deleteActivity
+                        onDeleteActivity = gradesVm::deleteActivity,
+                        onApplyTemplate = gradesVm::applyTemplate
                     )
                 }
             }

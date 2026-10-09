@@ -72,9 +72,22 @@ fun ScheduleScreen(
     var editing by remember { mutableStateOf<ClassItem?>(null) }
     var showDialog by remember { mutableStateOf(false) }
 
+    // Minuto actual del día, para saber la "próxima clase de hoy".
+    val nowMinutes = remember {
+        val c = Calendar.getInstance()
+        c.get(Calendar.HOUR_OF_DAY) * 60 + c.get(Calendar.MINUTE)
+    }
+
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
-            DaySelector(selectedDay) { selectedDay = it }
+            DaySelector(selectedDay, today) { selectedDay = it }
+
+            // Banner creativo: si estás viendo HOY, muestra la próxima clase.
+            if (selectedDay == today) {
+                val todayClasses = classesByDay[today].orEmpty().sortedBy { it.startMinutes }
+                val next = todayClasses.firstOrNull { it.endMinutes > nowMinutes }
+                NextClassBanner(next)
+            }
 
             val dayClasses = classesByDay[selectedDay].orEmpty()
             if (dayClasses.isEmpty()) {
@@ -126,7 +139,7 @@ fun ScheduleScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DaySelector(selected: Int, onSelect: (Int) -> Unit) {
+private fun DaySelector(selected: Int, today: Int, onSelect: (Int) -> Unit) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -135,9 +148,41 @@ private fun DaySelector(selected: Int, onSelect: (Int) -> Unit) {
             FilterChip(
                 selected = selected == day,
                 onClick = { onSelect(day) },
-                label = { Text(DAY_NAMES[day - 1]) }
+                label = {
+                    // Marca el día de hoy con un puntito.
+                    if (day == today) Text("• ${DAY_NAMES[day - 1]}") else Text(DAY_NAMES[day - 1])
+                }
             )
         }
+    }
+}
+
+@Composable
+private fun NextClassBanner(next: ClassItem?) {
+    val text = if (next != null) {
+        buildString {
+            append("Próxima: ")
+            append(next.name)
+            append(" · ${next.startText}")
+            if (next.room.isNotBlank()) append(" · ${next.room}")
+        }
+    } else {
+        "No quedan más clases por hoy 🎉"
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.10f))
+            .padding(horizontal = 14.dp, vertical = 10.dp)
+    ) {
+        Text(
+            text,
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
 

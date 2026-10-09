@@ -22,7 +22,13 @@ import com.example.horario.ui.theme.HorarioTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Pasamos del tema de arranque (splash oscuro con logo) al tema normal.
+        setTheme(R.style.Theme_Horario)
         super.onCreate(savedInstanceState)
+
+        // Programa el resumen diario de "mañana tienes..." (8 PM).
+        com.example.horario.notifications.DailySummaryScheduler.schedule(this)
+
         setContent {
             val systemDark = isSystemInDarkTheme()
             var isDark by remember { mutableStateOf(systemDark) }

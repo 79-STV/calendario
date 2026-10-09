@@ -17,6 +17,8 @@ class BootReceiver : BroadcastReceiver() {
             try {
                 val items = AppDatabase.get(context).classDao().getAll()
                 items.forEach { ReminderScheduler.schedule(context, it) }
+                // Reprograma también el resumen diario de "mañana tienes...".
+                DailySummaryScheduler.schedule(context)
             } finally {
                 pending.finish()
             }
