@@ -80,6 +80,9 @@ fun ScheduleScreen(
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
+            // Avisa y pide permisos si faltan (clave para que lleguen las notificaciones).
+            PermissionBanner()
+
             DaySelector(selectedDay, today) { selectedDay = it }
 
             // Banner creativo: si estás viendo HOY, muestra la próxima clase.
@@ -89,16 +92,13 @@ fun ScheduleScreen(
                 NextClassBanner(next)
             }
 
-            // Densidad: separa más (cómodo) o menos (compacto) las tarjetas.
-            val gap = if (LocalAppDensity.current == Density.COMPACT) 6.dp else 12.dp
-
             val dayClasses = classesByDay[selectedDay].orEmpty()
             if (dayClasses.isEmpty()) {
                 EmptyState(DAY_FULL[selectedDay - 1])
             } else {
                 LazyColumn(
                     contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(gap)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(dayClasses, key = { it.id }) { item ->
                         ClassCard(
@@ -194,14 +194,16 @@ private fun ClassCard(item: ClassItem, onEdit: () -> Unit, onDelete: () -> Unit)
     val accent = runCatching { Color(android.graphics.Color.parseColor(item.colorHex)) }
         .getOrDefault(MaterialTheme.colorScheme.primary)
 
-    val pad = if (LocalAppDensity.current == Density.COMPACT) 10.dp else 14.dp
-    AppCard(
-        modifier = Modifier.fillMaxWidth()
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(pad),
+                .padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(

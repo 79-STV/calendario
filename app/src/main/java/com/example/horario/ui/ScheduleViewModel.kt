@@ -25,6 +25,11 @@ class ScheduleViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { repo.save(item) }
     }
 
+    /** Guarda varias clases de golpe (usado al importar desde foto). */
+    fun saveAll(items: List<ClassItem>) {
+        viewModelScope.launch { items.forEach { repo.save(it) } }
+    }
+
     fun delete(item: ClassItem) {
         viewModelScope.launch { repo.delete(item) }
     }

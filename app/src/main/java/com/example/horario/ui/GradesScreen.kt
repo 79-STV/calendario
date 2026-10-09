@@ -153,10 +153,12 @@ private fun SubjectCard(
     val grade = data.projectedGrade
     val status = GradeStatus.of(grade)
 
-    AppCard(
-        modifier = Modifier.fillMaxWidth()
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
-      Column {
         // Cabecera: nombre + nota con color + flecha
         Row(
             modifier = Modifier
@@ -225,7 +227,6 @@ private fun SubjectCard(
                 }
             }
         }
-      }
     }
 }
 
