@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.outlined.AddAPhoto
 import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.ContentPaste
 import androidx.compose.material.icons.outlined.Grading
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -39,6 +40,7 @@ fun MainScreen(
 ) {
     var tab by remember { mutableStateOf(Tab.HORARIO) }
     var showImport by remember { mutableStateOf(false) }
+    var showPaste by remember { mutableStateOf(false) }
 
     val scheduleVm: ScheduleViewModel = viewModel()
     val gradesVm: GradesViewModel = viewModel()
@@ -65,6 +67,12 @@ fun MainScreen(
                 },
                 actions = {
                     if (tab == Tab.HORARIO) {
+                        IconButton(onClick = { showPaste = true }) {
+                            Icon(
+                                Icons.Outlined.ContentPaste,
+                                contentDescription = "Pegar horario (texto)"
+                            )
+                        }
                         IconButton(onClick = { showImport = true }) {
                             Icon(
                                 Icons.Outlined.AddAPhoto,
@@ -137,6 +145,22 @@ fun MainScreen(
                         onConfirm = { items ->
                             scheduleVm.saveAll(items)
                             showImport = false
+                        }
+                    )
+                }
+            }
+
+            // Pantalla de importación pegando texto, superpuesta sobre el contenido.
+            if (showPaste) {
+                androidx.compose.material3.Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.background
+                ) {
+                    ImportTextScreen(
+                        onCancel = { showPaste = false },
+                        onConfirm = { items ->
+                            scheduleVm.saveAll(items)
+                            showPaste = false
                         }
                     )
                 }
