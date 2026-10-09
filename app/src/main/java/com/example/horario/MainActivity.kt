@@ -59,11 +59,11 @@ class MainActivity : ComponentActivity() {
                             isDark = isDark,
                             onToggleTheme = { themeVm.toggleDark(isDark) },
                             selectedPalette = themeVm.palette,
-                            onSelectPalette = themeVm::setPalette,
+                            onSelectPalette = themeVm::updatePalette,
                             themeMode = themeVm.mode,
-                            onSelectMode = themeVm::setMode,
+                            onSelectMode = themeVm::updateMode,
                             cardStyle = themeVm.cardStyle,
-                            onSelectCardStyle = themeVm::setCardStyle
+                            onSelectCardStyle = themeVm::updateCardStyle
                         )
                     }
                 }
