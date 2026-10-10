@@ -12,7 +12,8 @@ object QrGenerator {
 
     fun generate(text: String, size: Int = 720): Bitmap {
         val hints = mapOf(
-            EncodeHintType.ERROR_CORRECTION to ErrorCorrectionLevel.M,
+            // Nivel L: permite MÁS datos por QR (suficiente para pantalla a pantalla).
+            EncodeHintType.ERROR_CORRECTION to ErrorCorrectionLevel.L,
             EncodeHintType.MARGIN to 1,
             EncodeHintType.CHARACTER_SET to "UTF-8"
         )
