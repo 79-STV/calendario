@@ -13,9 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -24,16 +23,15 @@ import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.ContentPaste
 import androidx.compose.material.icons.outlined.Grading
 import androidx.compose.material.icons.outlined.Palette
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -156,7 +154,7 @@ fun MainScreen(
     }
 
     if (showAppearance) {
-        AppearanceDialog(
+        AppearanceSheet(
             themeMode = themeMode,
             onSelectMode = onSelectMode,
             accentColor = accentColor,
@@ -225,67 +223,82 @@ private fun NavPill(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-private fun AppearanceDialog(
+private fun AppearanceSheet(
     themeMode: ThemeMode,
     onSelectMode: (ThemeMode) -> Unit,
     accentColor: Int,
     onSelectAccent: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Apariencia") },
-        text = {
-            Column {
-                Text("Tema", fontWeight = FontWeight.Medium)
-                Spacer(Modifier.height(6.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    ModeChip("Sistema", themeMode == ThemeMode.SYSTEM) { onSelectMode(ThemeMode.SYSTEM) }
-                    ModeChip("Claro", themeMode == ThemeMode.LIGHT) { onSelectMode(ThemeMode.LIGHT) }
-                    ModeChip("Oscuro", themeMode == ThemeMode.DARK) { onSelectMode(ThemeMode.DARK) }
-                    ModeChip("Negro", themeMode == ThemeMode.AMOLED) { onSelectMode(ThemeMode.AMOLED) }
-                }
+    ModalBottomSheet(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 24.dp, end = 24.dp, bottom = 32.dp)
+        ) {
+            Text(
+                "Apariencia",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
 
-                Spacer(Modifier.height(16.dp))
-                Text("Color de acento", fontWeight = FontWeight.Medium)
-                Spacer(Modifier.height(8.dp))
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(6),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    modifier = Modifier.height(110.dp)
-                ) {
-                    items(ACCENTS) { c ->
-                        val color = Color(c)
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(color)
-                                .border(
-                                    width = if (c == accentColor) 3.dp else 0.dp,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    shape = CircleShape
-                                )
-                                .clickable { onSelectAccent(c) },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            if (c == accentColor) {
-                                Icon(
-                                    Icons.Filled.Check,
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
+            Spacer(Modifier.height(24.dp))
+            SectionLabel("Tema")
+            Spacer(Modifier.height(10.dp))
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ModeChip("Sistema", themeMode == ThemeMode.SYSTEM) { onSelectMode(ThemeMode.SYSTEM) }
+                ModeChip("Claro", themeMode == ThemeMode.LIGHT) { onSelectMode(ThemeMode.LIGHT) }
+                ModeChip("Oscuro", themeMode == ThemeMode.DARK) { onSelectMode(ThemeMode.DARK) }
+                ModeChip("Negro", themeMode == ThemeMode.AMOLED) { onSelectMode(ThemeMode.AMOLED) }
+            }
+
+            Spacer(Modifier.height(28.dp))
+            SectionLabel("Color de acento")
+            Spacer(Modifier.height(14.dp))
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                ACCENTS.forEach { c ->
+                    val color = Color(c)
+                    val selected = c == accentColor
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(CircleShape)
+                            .background(color)
+                            .border(
+                                width = if (selected) 3.dp else 0.dp,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                shape = CircleShape
+                            )
+                            .clickable { onSelectAccent(c) },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (selected) {
+                            Icon(
+                                Icons.Filled.Check,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(22.dp)
+                            )
                         }
                     }
                 }
             }
-        },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Listo") } }
+        }
+    }
+}
+
+@Composable
+private fun SectionLabel(text: String) {
+    Text(
+        text,
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.SemiBold,
+        color = MaterialTheme.colorScheme.onSurface
     )
 }
 
