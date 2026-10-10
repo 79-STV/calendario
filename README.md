@@ -12,6 +12,7 @@ Dos pestañas: **📅 Horario** y **📝 Notas**.
 - 🗓️ Horario semanal (Lunes a Domingo) con selector de día.
 - ➕ Agregar / editar / borrar clases: materia, aula/nota, día, hora de inicio y fin, color.
 - 📋 **Pegar horario (texto):** pega tu horario y la app detecta **día, materia, hora y aula automáticamente**. Incluye un botón **"Copiar prompt para mi IA"**: copias el prompt, se lo das a tu IA (ChatGPT, Gemini...) junto con la foto/texto de tu horario, y pegas aquí el resultado ya ordenado.
+- 📱 **Compartir por QR:** genera un código QR con tu horario y otra persona lo escanea para copiarlo al instante (menú ⋮ → Compartir).
 
 ### Notas (calculadora de calificaciones)
 - 📚 Crea materias como **lista desplegable** que muestra su **nota/promedio** con color.

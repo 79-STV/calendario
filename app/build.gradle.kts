@@ -58,5 +58,9 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
+    // QR: generar (ZXing) y escanear (Google code scanner, con UI propia)
+    implementation(libs.zxing.core)
+    implementation(libs.mlkit.code.scanner)
+
     debugImplementation(libs.androidx.ui.tooling)
 }

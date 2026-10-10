@@ -25,6 +25,7 @@ import androidx.compose.material.icons.outlined.ContentPaste
 import androidx.compose.material.icons.outlined.Grading
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Palette
+import androidx.compose.material.icons.outlined.QrCode2
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -75,10 +76,14 @@ fun MainScreen(
     var showPaste by remember { mutableStateOf(false) }
     var showAppearance by remember { mutableStateOf(false) }
     var showInfo by remember { mutableStateOf(false) }
+    var showShare by remember { mutableStateOf(false) }
     var menuOpen by remember { mutableStateOf(false) }
 
     val scheduleVm: ScheduleViewModel = viewModel()
     val gradesVm: GradesViewModel = viewModel()
+
+    val classesByDayAll by scheduleVm.classesByDay.collectAsStateWithLifecycle()
+    val allClasses = remember(classesByDayAll) { classesByDayAll.values.flatten() }
 
     val greeting = remember {
         val h = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
@@ -114,6 +119,11 @@ fun MainScreen(
                             onDismissRequest = { menuOpen = false }
                         ) {
                             DropdownMenuItem(
+                                text = { Text("Compartir (QR)") },
+                                leadingIcon = { Icon(Icons.Outlined.QrCode2, contentDescription = null) },
+                                onClick = { menuOpen = false; showShare = true }
+                            )
+                            DropdownMenuItem(
                                 text = { Text("Tema") },
                                 leadingIcon = { Icon(Icons.Outlined.Palette, contentDescription = null) },
                                 onClick = { menuOpen = false; showAppearance = true }
@@ -136,9 +146,8 @@ fun MainScreen(
         ) {
             when (tab) {
                 Tab.HORARIO -> {
-                    val classesByDay by scheduleVm.classesByDay.collectAsStateWithLifecycle()
                     ScheduleScreen(
-                        classesByDay = classesByDay,
+                        classesByDay = classesByDayAll,
                         onSave = scheduleVm::save,
                         onDelete = scheduleVm::delete
                     )
@@ -189,6 +198,16 @@ fun MainScreen(
 
     if (showInfo) {
         InfoSheet(onDismiss = { showInfo = false })
+    }
+
+    if (showShare) {
+        Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+            ShareScreen(
+                classes = allClasses,
+                onClose = { showShare = false },
+                onImported = { imported -> scheduleVm.saveAll(imported); showShare = false }
+            )
+        }
     }
 }
 
