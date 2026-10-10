@@ -58,5 +58,9 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
+    // Widget de pantalla de inicio (Jetpack Glance)
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
+
     debugImplementation(libs.androidx.ui.tooling)
 }
