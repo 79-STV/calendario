@@ -12,12 +12,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.horario.ui.MainScreen
+import com.example.horario.ui.ThemeMode
+import com.example.horario.ui.ThemeViewModel
+import com.example.horario.ui.theme.DarkFlavor
 import com.example.horario.ui.theme.HorarioTheme
 
 class MainActivity : ComponentActivity() {
@@ -30,8 +30,15 @@ class MainActivity : ComponentActivity() {
         com.example.horario.notifications.DailySummaryScheduler.schedule(this)
 
         setContent {
+            val themeVm: ThemeViewModel = viewModel()
             val systemDark = isSystemInDarkTheme()
-            var isDark by remember { mutableStateOf(systemDark) }
+
+            val flavor = when (themeVm.mode) {
+                ThemeMode.SYSTEM -> if (systemDark) DarkFlavor.DARK else DarkFlavor.LIGHT
+                ThemeMode.LIGHT -> DarkFlavor.LIGHT
+                ThemeMode.DARK -> DarkFlavor.DARK
+                ThemeMode.AMOLED -> DarkFlavor.AMOLED
+            }
 
             // Pide permiso de notificaciones en Android 13+
             val permissionLauncher = rememberLauncherForActivityResult(
@@ -44,14 +51,16 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            HorarioTheme(darkTheme = isDark) {
+            HorarioTheme(flavor = flavor, accentArgb = themeVm.accentColor) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     MainScreen(
-                        isDark = isDark,
-                        onToggleTheme = { isDark = !isDark }
+                        themeMode = themeVm.mode,
+                        onSelectMode = themeVm::updateMode,
+                        accentColor = themeVm.accentColor,
+                        onSelectAccent = themeVm::updateAccent
                     )
                 }
             }

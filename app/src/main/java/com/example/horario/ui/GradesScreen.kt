@@ -73,7 +73,7 @@ fun GradesScreen(
             EmptyGrades()
         } else {
             LazyColumn(
-                contentPadding = PaddingValues(16.dp),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 110.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(subjects, key = { it.subject.id }) { sa ->
@@ -97,7 +97,7 @@ fun GradesScreen(
             onClick = { showAddSubject = true },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(16.dp)
+                .padding(end = 16.dp, bottom = 90.dp)
         ) {
             Icon(Icons.Filled.Add, contentDescription = "Agregar materia")
         }
