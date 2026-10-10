@@ -1,7 +1,7 @@
 package com.example.horario.widget
 
+import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
@@ -36,16 +36,14 @@ class ScheduleWidget : GlanceAppWidget() {
     @Composable
     private fun WidgetContent(state: WidgetState) {
         val context = androidx.glance.LocalContext.current
-        val openAppIntent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
+        val mainActivity = ComponentName(context.packageName, MainActivity::class.java.name)
         Column(
             modifier = GlanceModifier
                 .fillMaxSize()
                 .background(Color(0xFF1E1E27))
                 .cornerRadius(20.dp)
                 .padding(16.dp)
-                .clickable(actionStartActivity(openAppIntent)),
+                .clickable(actionStartActivity(mainActivity)),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
