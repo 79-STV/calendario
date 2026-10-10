@@ -97,7 +97,8 @@ fun ScheduleScreen(
                 EmptyState(DAY_FULL[selectedDay - 1])
             } else {
                 LazyColumn(
-                    contentPadding = PaddingValues(16.dp),
+                    // Padding inferior extra para que la barra flotante no tape la última tarjeta.
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 110.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(dayClasses, key = { it.id }) { item ->
@@ -121,7 +122,8 @@ fun ScheduleScreen(
             },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(16.dp)
+                // Más arriba para no chocar con la barra flotante.
+                .padding(end = 16.dp, bottom = 90.dp)
         ) {
             Icon(Icons.Filled.Add, contentDescription = "Agregar clase")
         }
