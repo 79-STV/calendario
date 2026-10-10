@@ -1,47 +1,53 @@
 package com.example.horario.ocr
 
 /**
- * Resultado detectado por el OCR para una posible clase.
- * El DÍA no se detecta (es poco fiable en tablas) → lo elige el usuario después.
+ * Resultado detectado al analizar el texto de un horario.
+ * @param day 1=Lun ... 7=Dom ; 0 si no se detectó el día.
  */
 data class DetectedClass(
     val name: String,
     val startMinutes: Int?,
     val endMinutes: Int?,
-    val room: String
+    val room: String,
+    val day: Int = 0
 )
 
 /**
- * Convierte el texto crudo del OCR en una lista de posibles clases.
- * Parser por reglas (sin IA) y TOLERANTE: la materia, la hora y el aula
- * pueden venir en líneas separadas (como suele pasar en una tabla).
+ * Convierte texto de un horario en una lista de clases, por reglas (sin IA).
+ * Detecta día(s), hora y aula. Si una línea tiene varios días, crea una clase
+ * por cada día. Tolerante: datos pueden venir en líneas separadas.
  */
 object ScheduleParser {
 
-    // Rango de horas: "12-14", "12:00-14:00", "8 a 10", "08:00 - 10:00", "8–10"
     private val timeRange = Regex(
         """(\d{1,2})(?::(\d{2}))?\s*(?:-|–|—|a|hasta|/)\s*(\d{1,2})(?::(\d{2}))?"""
     )
-    // Una sola hora suelta: "12:00", "8", "08"
     private val singleTime = Regex("""\b(\d{1,2})(?::(\d{2}))?\b""")
 
     private val roomRegex = Regex(
         """(?i)\b(aula|sal[oó]n|sala|edificio|bloque|lab|laboratorio)\b[\s:.\-]*([\wáéíóúñ°\-]+(?:\s+[\w°\-]+){0,2})"""
     )
 
-    // Palabras que NO son nombres de materia (ruido típico del OCR).
+    // Mapa de palabras de día -> número (1..7). Incluye abreviaturas y sin tildes.
+    private val dayWords: List<Pair<Regex, Int>> = listOf(
+        Regex("""(?i)\blunes\b|\blun\b|\blu\b""") to 1,
+        Regex("""(?i)\bmartes\b|\bmar\b|\bma\b""") to 2,
+        Regex("""(?i)\bmi[eé]rcoles\b|\bmi[eé]\b|\bmier\b|\bmc\b""") to 3,
+        Regex("""(?i)\bjueves\b|\bjue\b|\bju\b""") to 4,
+        Regex("""(?i)\bviernes\b|\bvie\b|\bvi\b""") to 5,
+        Regex("""(?i)\bs[aá]bado\b|\bs[aá]b\b|\bsa\b""") to 6,
+        Regex("""(?i)\bdomingo\b|\bdom\b|\bdo\b""") to 7
+    )
+
     private val noiseWords = setOf(
         "lun", "mar", "mie", "mié", "jue", "vie", "sab", "sáb", "dom",
         "lunes", "martes", "miercoles", "miércoles", "jueves", "viernes", "sabado", "sábado", "domingo",
         "grupo", "codigo", "código", "creditos", "créditos", "clasificacion", "clasificación",
-        "sede", "ftte", "techne", "horario", "clases", "nota", "notas", "promedio", "parcial"
+        "sede", "ftte", "techne", "horario", "clases", "nota", "notas", "promedio", "parcial", "y"
     )
 
     fun parse(rawText: String): List<DetectedClass> {
-        val lines = rawText.split("\n")
-            .map { it.trim() }
-            .filter { it.isNotBlank() }
-
+        val lines = rawText.split("\n").map { it.trim() }.filter { it.isNotBlank() }
         val result = mutableListOf<DetectedClass>()
 
         for ((index, line) in lines.withIndex()) {
@@ -55,64 +61,56 @@ object ScheduleParser {
             val start = startH.coerceIn(0, 23) * 60 + startM.coerceIn(0, 59)
             val end = endH.coerceIn(0, 23) * 60 + endM.coerceIn(0, 59)
 
-            // 1) Lo que queda de ESTA línea sin la hora.
             var rest = line.replace(range.value, " ")
 
-            // 2) Aula: la buscamos en esta línea y en la siguiente.
+            // Aula (en esta línea o la siguiente).
             val around = listOf(line, lines.getOrNull(index + 1) ?: "").joinToString(" ")
             val roomMatch = roomRegex.find(around)
             val room = roomMatch?.value?.trim()?.replace(Regex("\\s+"), " ") ?: ""
             if (roomMatch != null) rest = rest.replace(roomMatch.value, " ")
 
-            // 3) Nombre: lo que quede en esta línea; si no hay, miramos la anterior.
-            var name = cleanName(rest)
-            if (name.isBlank()) {
-                name = cleanName(lines.getOrNull(index - 1) ?: "")
-            }
+            // Día(s) detectados en la línea (puede haber varios: "martes y jueves").
+            val days = detectDays(line)
+            // Quitar las palabras de día del texto para que no ensucien el nombre.
+            days.forEach { _ -> }
+            var cleaned = rest
+            dayWords.forEach { (rx, _) -> cleaned = rx.replace(cleaned, " ") }
 
-            result.add(
-                DetectedClass(
-                    name = name.ifBlank { "Clase" },
-                    startMinutes = start,
-                    endMinutes = if (end > start) end else null,
-                    room = room
-                )
+            var name = cleanName(cleaned)
+            if (name.isBlank()) name = cleanName(lines.getOrNull(index - 1) ?: "")
+
+            val base = DetectedClass(
+                name = name.ifBlank { "Clase" },
+                startMinutes = start,
+                endMinutes = if (end > start) end else null,
+                room = room
             )
-        }
 
-        // Si no encontramos rangos, intento más agresivo: líneas con una sola hora.
-        if (result.isEmpty()) {
-            for ((index, line) in lines.withIndex()) {
-                val st = singleTime.find(line) ?: continue
-                val h = st.groupValues[1].toIntOrNull() ?: continue
-                if (h !in 5..22) continue // horas razonables de clase
-                val m = st.groupValues[2].toIntOrNull() ?: 0
-                val start = h * 60 + m
-                val name = cleanName(line.replace(st.value, " "))
-                    .ifBlank { cleanName(lines.getOrNull(index - 1) ?: "") }
-                if (name.isNotBlank() && name != "Clase") {
-                    result.add(
-                        DetectedClass(
-                            name = name,
-                            startMinutes = start,
-                            endMinutes = start + 120, // suponemos 2h, el usuario corrige
-                            room = ""
-                        )
-                    )
-                }
+            if (days.isEmpty()) {
+                result.add(base) // día 0 = sin asignar
+            } else {
+                days.forEach { d -> result.add(base.copy(day = d)) }
             }
         }
 
         return result
     }
 
+    /** Devuelve los días (1..7) mencionados en la línea, sin repetir. */
+    private fun detectDays(line: String): List<Int> {
+        val found = linkedSetOf<Int>()
+        for ((rx, num) in dayWords) {
+            if (rx.containsMatchIn(line)) found.add(num)
+        }
+        return found.toList()
+    }
+
     private fun cleanName(text: String): String {
         val cleaned = text
             .replace(Regex("""[|•·:,/]+"""), " ")
-            .replace(Regex("""\b\d+\b"""), " ")      // quita números sueltos
+            .replace(Regex("""\b\d+\b"""), " ")
             .replace(Regex("""\s{2,}"""), " ")
             .trim()
-        // Si lo que queda es solo ruido (día, "grupo", etc.), lo descartamos.
         val lower = cleaned.lowercase()
         if (cleaned.length < 3) return ""
         if (noiseWords.any { lower == it }) return ""
