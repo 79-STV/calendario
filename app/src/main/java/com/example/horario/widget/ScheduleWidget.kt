@@ -1,6 +1,7 @@
 package com.example.horario.widget
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
@@ -9,7 +10,7 @@ import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.provideContent
-import androidx.glance.appwidget.action.actionStartActivity
+import androidx.glance.action.actionStartActivity
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.background
 import androidx.glance.layout.Alignment
@@ -34,13 +35,17 @@ class ScheduleWidget : GlanceAppWidget() {
 
     @Composable
     private fun WidgetContent(state: WidgetState) {
+        val context = androidx.glance.LocalContext.current
+        val openAppIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
         Column(
             modifier = GlanceModifier
                 .fillMaxSize()
                 .background(Color(0xFF1E1E27))
                 .cornerRadius(20.dp)
                 .padding(16.dp)
-                .clickable(actionStartActivity<MainActivity>()),
+                .clickable(actionStartActivity(openAppIntent)),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
