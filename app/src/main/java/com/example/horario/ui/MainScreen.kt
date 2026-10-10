@@ -20,7 +20,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.outlined.AddAPhoto
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.ContentPaste
 import androidx.compose.material.icons.outlined.Grading
@@ -71,7 +70,6 @@ fun MainScreen(
     onSelectAccent: (Int) -> Unit
 ) {
     var tab by remember { mutableStateOf(Tab.HORARIO) }
-    var showImport by remember { mutableStateOf(false) }
     var showPaste by remember { mutableStateOf(false) }
     var showAppearance by remember { mutableStateOf(false) }
 
@@ -100,9 +98,6 @@ fun MainScreen(
                     if (tab == Tab.HORARIO) {
                         IconButton(onClick = { showPaste = true }) {
                             Icon(Icons.Outlined.ContentPaste, contentDescription = "Pegar horario")
-                        }
-                        IconButton(onClick = { showImport = true }) {
-                            Icon(Icons.Outlined.AddAPhoto, contentDescription = "Importar desde foto")
                         }
                     }
                     IconButton(onClick = { showAppearance = true }) {
@@ -149,14 +144,6 @@ fun MainScreen(
                     .padding(bottom = 18.dp)
             )
 
-            if (showImport) {
-                Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    ImportPhotoScreen(
-                        onCancel = { showImport = false },
-                        onConfirm = { items -> scheduleVm.saveAll(items); showImport = false }
-                    )
-                }
-            }
             if (showPaste) {
                 Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     ImportTextScreen(

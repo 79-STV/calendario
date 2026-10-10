@@ -36,7 +36,6 @@ private val COLORS = listOf(
     "#7C4DFF", "#35D6A4", "#FF6E6E", "#FFB300",
     "#4FC3F7", "#FF8A65", "#BA68C8", "#90A4AE"
 )
-private val REMINDERS = listOf(0, 5, 10, 15, 30)
 private val DIALOG_DAYS = listOf("Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom")
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,7 +52,6 @@ fun ClassEditorDialog(
     var start by remember { mutableStateOf(existing?.startText ?: "08:00") }
     var end by remember { mutableStateOf(existing?.endText ?: "09:00") }
     var color by remember { mutableStateOf(existing?.colorHex ?: COLORS.first()) }
-    var reminder by remember { mutableStateOf(existing?.reminderMinutes ?: 10) }
     var error by remember { mutableStateOf<String?>(null) }
 
     AlertDialog(
@@ -123,17 +121,6 @@ fun ClassEditorDialog(
                     }
                 }
 
-                Text("Recordatorio", fontWeight = FontWeight.Medium)
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    items(REMINDERS) { r ->
-                        FilterChip(
-                            selected = reminder == r,
-                            onClick = { reminder = r },
-                            label = { Text(if (r == 0) "No avisar" else "$r min") }
-                        )
-                    }
-                }
-
                 error?.let {
                     Text(it, color = MaterialTheme.colorScheme.error)
                 }
@@ -156,8 +143,7 @@ fun ClassEditorDialog(
                             dayOfWeek = day,
                             startMinutes = s,
                             endMinutes = e,
-                            colorHex = color,
-                            reminderMinutes = reminder
+                            colorHex = color
                         )
                     )
                 }
