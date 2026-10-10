@@ -1,4 +1,3 @@
 <resources>
     <string name="app_name">Horario</string>
-    <string name="widget_description">Muestra tu clase actual o la próxima.</string>
 </resources>

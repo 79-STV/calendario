@@ -25,7 +25,6 @@ import androidx.compose.material.icons.outlined.ContentPaste
 import androidx.compose.material.icons.outlined.Grading
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Palette
-import androidx.compose.material.icons.outlined.Widgets
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -75,7 +74,6 @@ fun MainScreen(
     var tab by remember { mutableStateOf(Tab.HORARIO) }
     var showPaste by remember { mutableStateOf(false) }
     var showAppearance by remember { mutableStateOf(false) }
-    var showWidgetInfo by remember { mutableStateOf(false) }
     var showInfo by remember { mutableStateOf(false) }
     var menuOpen by remember { mutableStateOf(false) }
 
@@ -106,7 +104,7 @@ fun MainScreen(
                             Icon(Icons.Outlined.ContentPaste, contentDescription = "Pegar horario")
                         }
                     }
-                    // Menú de 3 puntos: Tema / Widget / Info
+                    // Menú de 3 puntos: Tema / Información
                     Box {
                         IconButton(onClick = { menuOpen = true }) {
                             Icon(Icons.Filled.MoreVert, contentDescription = "Más opciones")
@@ -119,11 +117,6 @@ fun MainScreen(
                                 text = { Text("Tema") },
                                 leadingIcon = { Icon(Icons.Outlined.Palette, contentDescription = null) },
                                 onClick = { menuOpen = false; showAppearance = true }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Widget") },
-                                leadingIcon = { Icon(Icons.Outlined.Widgets, contentDescription = null) },
-                                onClick = { menuOpen = false; showWidgetInfo = true }
                             )
                             DropdownMenuItem(
                                 text = { Text("Información") },
@@ -192,10 +185,6 @@ fun MainScreen(
             onSelectAccent = onSelectAccent,
             onDismiss = { showAppearance = false }
         )
-    }
-
-    if (showWidgetInfo) {
-        WidgetSheet(onDismiss = { showWidgetInfo = false })
     }
 
     if (showInfo) {
@@ -327,46 +316,6 @@ private fun AppearanceSheet(
                     }
                 }
             }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun WidgetSheet(onDismiss: () -> Unit) {
-    ModalBottomSheet(onDismissRequest = onDismiss) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 24.dp, end = 24.dp, bottom = 32.dp)
-        ) {
-            Text(
-                "Widget",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(Modifier.height(16.dp))
-            Text(
-                "El widget muestra tu clase actual (o la próxima) en la pantalla de inicio.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
-            )
-            Spacer(Modifier.height(16.dp))
-            SectionLabel("Cómo agregarlo")
-            Spacer(Modifier.height(8.dp))
-            Text(
-                "1. Mantén pulsada la pantalla de inicio del teléfono.\n" +
-                    "2. Toca \"Widgets\".\n" +
-                    "3. Busca \"Horario\" y arrástralo donde quieras.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
-            )
-            Spacer(Modifier.height(16.dp))
-            Text(
-                "El widget se actualiza solo con el paso de las horas.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-            )
         }
     }
 }

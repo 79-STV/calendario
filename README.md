@@ -11,7 +11,7 @@ Dos pestañas: **📅 Horario** y **📝 Notas**.
 ### Horario
 - 🗓️ Horario semanal (Lunes a Domingo) con selector de día.
 - ➕ Agregar / editar / borrar clases: materia, aula/nota, día, hora de inicio y fin, color.
-- 📋 **Pegar horario (texto):** copia tu horario de la web de la universidad y pégalo; la app detecta materias, horas y aulas y tú eliges el día.
+- 📋 **Pegar horario (texto):** pega tu horario y la app detecta **día, materia, hora y aula automáticamente**. Incluye un botón **"Copiar prompt para mi IA"**: copias el prompt, se lo das a tu IA (ChatGPT, Gemini...) junto con la foto/texto de tu horario, y pegas aquí el resultado ya ordenado.
 
 ### Notas (calculadora de calificaciones)
 - 📚 Crea materias como **lista desplegable** que muestra su **nota/promedio** con color.

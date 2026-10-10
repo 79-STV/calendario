@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.horario.data.ClassItem
@@ -33,6 +34,14 @@ import com.example.horario.ocr.DetectedClass
 import com.example.horario.ocr.ScheduleParser
 
 private val DAYS_T = listOf("Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom")
+
+private const val AI_PROMPT =
+    "Organiza este horario de clases. Devuélveme SOLO una línea por clase, sin texto extra, " +
+    "con este formato exacto: Materia | Día | HoraInicio-HoraFin | Aula. " +
+    "Usa días completos (Lunes, Martes, ...). Ejemplo: " +
+    "Cálculo | Lunes | 08:00-10:00 | Aula 202. " +
+    "Si una clase se repite en varios días, pon una línea por cada día. " +
+    "Quita cualquier dato que no sea materia, día, hora o aula. Aquí está mi horario:"
 
 private class TextRow(detected: DetectedClass) {
     var name by mutableStateOf(detected.name)
@@ -42,7 +51,8 @@ private class TextRow(detected: DetectedClass) {
             ?: detected.startMinutes?.let { ClassItem.formatTime(it + 60) } ?: "09:00"
     )
     var room by mutableStateOf(detected.room)
-    var day by mutableStateOf(0)
+    // Día detectado automáticamente (0 si no se detectó).
+    var day by mutableStateOf(detected.day)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,23 +70,39 @@ fun ImportTextScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        val context = LocalContext.current
+
         Text("Pegar horario", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(6.dp))
         Text(
-            "Copia tu horario (de la web de tu universidad o donde lo tengas) y pégalo aquí. " +
-                "Detectaré materias, horas y aulas; tú eliges el día de cada una.",
+            "Pega tu horario con una clase por línea. Lo ideal es que quede así, sin datos de más:\n\n" +
+                "Materia  |  Día  |  Hora inicio - Hora fin  |  Aula\n\n" +
+                "La app detecta el día, la hora y el aula solita.",
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.75f)
         )
         Spacer(Modifier.height(10.dp))
 
+        // Prompt listo para que la persona lo use con SU IA (ChatGPT, Gemini, etc.)
+        OutlinedButton(
+            onClick = {
+                val clip = context.getSystemService(android.content.ClipboardManager::class.java)
+                clip?.setPrimaryClip(
+                    android.content.ClipData.newPlainText("prompt", AI_PROMPT)
+                )
+                status = "Prompt copiado. Pégalo en tu IA junto con la foto/texto de tu horario, y luego pega aquí el resultado."
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) { Text("Copiar prompt para mi IA") }
+
+        Spacer(Modifier.height(10.dp))
         OutlinedTextField(
             value = text,
             onValueChange = { text = it },
             label = { Text("Pega aquí el texto del horario") },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(140.dp)
+                .height(130.dp)
         )
         Spacer(Modifier.height(8.dp))
         Button(
@@ -87,7 +113,7 @@ fun ImportTextScreen(
                 status = if (detected.isEmpty())
                     "No detecté clases. Revisa que el texto incluya horas (ej. 12-14)."
                 else
-                    "Detecté ${detected.size}. Revisa, elige el día y guarda."
+                    "Detecté ${detected.size}. Revisa y guarda (el día ya viene detectado)."
             },
             enabled = text.isNotBlank(),
             modifier = Modifier.fillMaxWidth()
@@ -120,8 +146,7 @@ fun ImportTextScreen(
                             room = r.room.trim(),
                             dayOfWeek = r.day,
                             startMinutes = s,
-                            endMinutes = e,
-                            reminderMinutes = 10
+                            endMinutes = e
                         )
                     }
                     onConfirm(items)
