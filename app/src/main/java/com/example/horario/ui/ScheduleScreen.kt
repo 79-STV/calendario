@@ -80,9 +80,6 @@ fun ScheduleScreen(
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
-            // Avisa y pide permisos si faltan (clave para que lleguen las notificaciones).
-            PermissionBanner()
-
             DaySelector(selectedDay, today) { selectedDay = it }
 
             // Banner creativo: si estás viendo HOY, muestra la próxima clase.
@@ -231,13 +228,6 @@ private fun ClassCard(item: ClassItem, onEdit: () -> Unit, onDelete: () -> Unit)
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                     fontSize = 13.sp
                 )
-                if (item.reminderMinutes > 0) {
-                    Text(
-                        "🔔 ${item.reminderMinutes} min antes",
-                        color = accent,
-                        fontSize = 12.sp
-                    )
-                }
             }
             IconButton(onClick = onEdit) {
                 Icon(Icons.Filled.Edit, contentDescription = "Editar")

@@ -11,11 +11,7 @@ Dos pestañas: **📅 Horario** y **📝 Notas**.
 ### Horario
 - 🗓️ Horario semanal (Lunes a Domingo) con selector de día.
 - ➕ Agregar / editar / borrar clases: materia, aula/nota, día, hora de inicio y fin, color.
-- 🔔 **Notificación una vez antes de cada clase** (5, 10, 15 o 30 min antes, o sin aviso). Se repite cada semana.
-- 🌙 **Resumen diario a las 8 PM** con las clases de mañana.
-- 📋 **Pegar horario (texto):** copia tu horario de la web de la universidad y pégalo; la app detecta materias, horas y aulas y tú eliges el día. Es la forma **más precisa**.
-- 📸 **Importar desde foto (OCR offline):** alternativa con la cámara/galería usando **ML Kit** (en el dispositivo, sin internet). Útil pero menos exacta que pegar texto.
-- 🛎️ **Banner de permisos**: si faltan permisos para que lleguen las notificaciones, la app te guía para activarlos, con botón de **"Probar notificación"**.
+- 📋 **Pegar horario (texto):** copia tu horario de la web de la universidad y pégalo; la app detecta materias, horas y aulas y tú eliges el día.
 
 ### Notas (calculadora de calificaciones)
 - 📚 Crea materias como **lista desplegable** que muestra su **nota/promedio** con color.
@@ -24,17 +20,18 @@ Dos pestañas: **📅 Horario** y **📝 Notas**.
 - Calcula la **nota ponderada** = Σ(nota × %/100).
 - **Colores (escala 1.0–5.0, aprueba en 3.0):** 🔴 1.0–2.9 · 🟠 3.0–3.8 · 🟢 3.9–5.0.
 
+### Apariencia
+- 🎨 **Tema:** sigue al del teléfono por defecto, con opción de forzar **Claro / Oscuro / Negro (AMOLED)**.
+- 🌈 **Color de acento** elegible (12 colores).
+- 📱 Barra de navegación flotante y formas redondeadas.
+
 ### General
-- 🌙☀️ **Modo claro y oscuro** (sigue el sistema y se puede alternar con un botón).
 - 💾 Guardado local con **Room**. Todo offline.
-- 🔁 Los recordatorios se reprograman solos tras reiniciar el teléfono.
 
 ## Tecnología
 
 - Kotlin + Jetpack Compose (Material 3)
 - Room (persistencia local)
-- AlarmManager + NotificationManager (recordatorios)
-- ML Kit Text Recognition (OCR en el dispositivo)
 - minSdk 24 · targetSdk 34
 
 ## Cómo compilar y ejecutar
@@ -44,13 +41,5 @@ Dos pestañas: **📅 Horario** y **📝 Notas**.
 1. Abre **Android Studio** → **Open** → elige la carpeta del proyecto.
 2. Deja que Gradle sincronice (descarga dependencias la primera vez).
 3. **Run** ▶️ en un emulador o tu teléfono.
-4. Acepta el permiso de **notificaciones** y de **alarmas exactas** cuando la app lo pida (banner superior).
 
-> No hay nada de Gemini ni archivos `.env` / claves de API. El OCR de ML Kit funciona en el propio teléfono.
-
-## Permisos usados
-
-- `POST_NOTIFICATIONS` — mostrar los avisos (Android 13+).
-- `SCHEDULE_EXACT_ALARM` / `USE_EXACT_ALARM` — avisar a la hora exacta.
-- `RECEIVE_BOOT_COMPLETED` — reprogramar recordatorios tras reiniciar.
-- `CAMERA` — fotografiar el horario para importarlo (opcional; también puedes usar la galería).
+> No hay nada de Gemini ni archivos `.env` / claves de API. La app funciona 100 % offline y no pide permisos especiales.
